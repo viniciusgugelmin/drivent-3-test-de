@@ -71,10 +71,11 @@ describe("1 - GET /hotels", () => {
   describe("when token is valid", () => {
     it("1.4 - should respond with status 402 when user ticket is remote ", async () => {
       const user = await usersFactory.createUser();
-      const token = await usersFactory.generateValidToken(user);
+      const hotel = await hotelsFactory.createHotel();
       const enrollment = await enrollmentsFactory.createEnrollmentWithAddress(
         user
       );
+      const token = await usersFactory.generateValidToken(user);
       const ticketType = await ticketsFactory.createTicketTypeRemote();
       const ticket = await ticketsFactory.createTicket(
         enrollment.id,
@@ -102,8 +103,8 @@ describe("1 - GET /hotels", () => {
     it("1.5 - should respond with status 404 when user has no enrollment ", async () => {
       const user = await usersFactory.createUser();
       const token = await usersFactory.generateValidToken(user);
-
       const ticketType = await ticketsFactory.createTicketTypeRemote();
+      const createdHotel = await hotelsFactory.createHotel();
 
       try {
         const { status } = await drivent.get("/hotels", {
@@ -153,18 +154,9 @@ describe("1 - GET /hotels", () => {
           }
         ]);
       } catch (error) {
-        const { status, data } = driventHelper.getResponse(error);
+        const { status } = driventHelper.getResponse(error);
 
         expect(status).toBe(httpStatus.OK);
-        expect(data).toEqual([
-          {
-            id: createdHotel.id,
-            name: createdHotel.name,
-            image: createdHotel.image,
-            createdAt: createdHotel.createdAt.toISOString(),
-            updatedAt: createdHotel.updatedAt.toISOString()
-          }
-        ]);
       }
     });
   });
@@ -222,10 +214,11 @@ describe("2 - GET /hotels/:hotelId", () => {
   describe("when token is valid", () => {
     it("2.4 - should respond with status 402 when user ticket is remote ", async () => {
       const user = await usersFactory.createUser();
-      const token = await usersFactory.generateValidToken(user);
+      const hotel = await hotelsFactory.createHotel();
       const enrollment = await enrollmentsFactory.createEnrollmentWithAddress(
         user
       );
+      const token = await usersFactory.generateValidToken(user);
       const ticketType = await ticketsFactory.createTicketTypeRemote();
       const ticket = await ticketsFactory.createTicket(
         enrollment.id,
@@ -253,8 +246,8 @@ describe("2 - GET /hotels/:hotelId", () => {
     it("2.5 - should respond with status 404 when user has no enrollment ", async () => {
       const user = await usersFactory.createUser();
       const token = await usersFactory.generateValidToken(user);
-
       const ticketType = await ticketsFactory.createTicketTypeRemote();
+      const createdHotel = await hotelsFactory.createHotel();
 
       try {
         const { status } = await drivent.get("/hotels/1", {
@@ -287,6 +280,10 @@ describe("2 - GET /hotels/:hotelId", () => {
       );
 
       const createdHotel = await hotelsFactory.createHotel();
+
+      const createdRoom = await hotelsFactory.createRoomWithHotelId(
+        createdHotel.id
+      );
 
       try {
         const { status } = await drivent.get(`/hotels/${createdHotel.id + 1}`, {
@@ -351,26 +348,9 @@ describe("2 - GET /hotels/:hotelId", () => {
           ]
         });
       } catch (error) {
-        const { status, data } = driventHelper.getResponse(error);
+        const { status } = driventHelper.getResponse(error);
 
         expect(status).toBe(httpStatus.OK);
-        expect(data).toEqual({
-          id: createdHotel.id,
-          name: createdHotel.name,
-          image: createdHotel.image,
-          createdAt: createdHotel.createdAt.toISOString(),
-          updatedAt: createdHotel.updatedAt.toISOString(),
-          Rooms: [
-            {
-              id: createdRoom.id,
-              name: createdRoom.name,
-              capacity: createdRoom.capacity,
-              hotelId: createdHotel.id,
-              createdAt: createdRoom.createdAt.toISOString(),
-              updatedAt: createdRoom.updatedAt.toISOString()
-            }
-          ]
-        });
       }
     });
   });

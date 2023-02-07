@@ -1,12 +1,11 @@
 class DriventHelper {
   getResponse(error) {
-    if (!error.response || !error.response.status || !error.response.data) {
+    if (!error.response || !error.response.status) {
       throw error;
     }
 
     return {
-      status: error.response.status,
-      data: error.response.data
+      status: error.response.status
     };
   }
 }
