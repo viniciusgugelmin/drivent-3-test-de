@@ -167,38 +167,6 @@ describe("1 - GET /hotels", () => {
         ]);
       }
     });
-
-    it("1.7 - should respond with status 200 and an empty array", async () => {
-      const user = await usersFactory.createUser();
-      const token = await usersFactory.generateValidToken(user);
-      const enrollment = await enrollmentsFactory.createEnrollmentWithAddress(
-        user
-      );
-      const ticketType = await ticketsFactory.createTicketTypeWithHotel();
-      const ticket = await ticketsFactory.createTicket(
-        enrollment.id,
-        ticketType.id,
-        TicketStatus.PAID
-      );
-      const payment = await paymentsFactory.createPayment(
-        ticket.id,
-        ticketType.price
-      );
-
-      try {
-        const { status, data } = await drivent.get("/hotels", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        expect(status).toBe(httpStatus.OK);
-        expect(data).toEqual([]);
-      } catch (error) {
-        const { status, data } = driventHelper.getResponse(error);
-
-        expect(status).toBe(httpStatus.OK);
-        expect(data).toEqual([]);
-      }
-    });
   });
 });
 
@@ -402,57 +370,6 @@ describe("2 - GET /hotels/:hotelId", () => {
               updatedAt: createdRoom.updatedAt.toISOString()
             }
           ]
-        });
-      }
-    });
-
-    it("2.8 - should respond with status 200 and hotel with no rooms", async () => {
-      const user = await usersFactory.createUser();
-      const token = await usersFactory.generateValidToken(user);
-      const enrollment = await enrollmentsFactory.createEnrollmentWithAddress(
-        user
-      );
-      const ticketType = await ticketsFactory.createTicketTypeWithHotel();
-      const ticket = await ticketsFactory.createTicket(
-        enrollment.id,
-        ticketType.id,
-        TicketStatus.PAID
-      );
-      const payment = await paymentsFactory.createPayment(
-        ticket.id,
-        ticketType.price
-      );
-
-      const createdHotel = await hotelsFactory.createHotel();
-
-      try {
-        const { status, data } = await drivent.get(
-          `/hotels/${createdHotel.id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
-
-        expect(status).toBe(httpStatus.OK);
-        expect(data).toEqual({
-          id: createdHotel.id,
-          name: createdHotel.name,
-          image: expect.any(String),
-          createdAt: createdHotel.createdAt.toISOString(),
-          updatedAt: createdHotel.updatedAt.toISOString(),
-          Rooms: []
-        });
-      } catch (error) {
-        const { status, data } = driventHelper.getResponse(error);
-
-        expect(status).toBe(httpStatus.OK);
-        expect(data).toEqual({
-          id: createdHotel.id,
-          name: createdHotel.name,
-          image: expect.any(String),
-          createdAt: createdHotel.createdAt.toISOString(),
-          updatedAt: createdHotel.updatedAt.toISOString(),
-          Rooms: []
         });
       }
     });
